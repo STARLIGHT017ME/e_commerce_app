@@ -12,9 +12,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       print(jsonDecode(response.body));
-      return json.decode(response.body);
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
     } else {
-      throw ("An error occurred");
+      throw ("Failed to fetch products. Status code: ${response.statusCode}");
     }
   }
 }

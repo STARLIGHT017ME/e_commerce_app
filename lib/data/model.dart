@@ -1,5 +1,5 @@
 class ECommerceModel {
-  late final String id;
+  late final double id;
   late final String title;
   late final double price;
   late final String description;
@@ -17,9 +17,9 @@ class ECommerceModel {
 
   factory ECommerceModel.fromJson(Map<String, dynamic> json) {
     return ECommerceModel(
-      id: json["id"],
+      id: (json["id"] as num).toDouble(),
       title: json["title"],
-      price: json["price"],
+      price: (json["price"] as num).toDouble(),
       description: json["description"],
       image: json["image"],
       ratings: Ratings.fromJson(json["rating"]),
@@ -29,14 +29,14 @@ class ECommerceModel {
 
 class Ratings {
   final double rate;
-  final int count;
+  final double count;
 
   Ratings({required this.rate, required this.count});
 
   factory Ratings.fromJson(Map<String, dynamic> json) {
     return Ratings(
-      rate: json["rate"],
-      count: json["count"],
+      rate: (json["rate"] as num).toDouble(),
+      count: (json["count"] as num).toDouble(),
     );
   }
 }
