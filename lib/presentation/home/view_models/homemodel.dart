@@ -6,13 +6,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // create an instance of the respository so it can be used across different models
 //also integrated flutter provider with it so it can be watche
-final respositoryProvider = Provider<Respository>((Ref ref) {
-  return Respository(
-    ApiService(
-      appConstraint: AppConstraint(),
-    ),
-  );
-});
+
+//these is dependency injection
+final respositoryProvider = Provider<Respository>(
+  (Ref ref) {
+    return Respository(
+      ApiService(
+        appConstraint: AppConstraint(),
+      ),
+    );
+  },
+);
 final productProvider = FutureProvider<List<ECommerceModel>>(
   (ref) async {
     final respository = ref.watch(respositoryProvider);

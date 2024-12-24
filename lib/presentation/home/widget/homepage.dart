@@ -1,4 +1,5 @@
 import 'package:e_commerce_app/presentation/home/view_models/homemodel.dart';
+import 'package:e_commerce_app/presentation/product_details/widget/product_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,6 +20,12 @@ class Homepage extends ConsumerWidget {
                       title: Text(product.title),
                       subtitle: Text("\$${product.price}"),
                       leading: Image.network(product.image),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetail(product: product),
+                        ),
+                      ),
                     );
                   },
                 ),
