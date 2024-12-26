@@ -10,7 +10,7 @@ class ProductDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
             Image.network(product.image),
@@ -21,7 +21,7 @@ class ProductDetail extends StatelessWidget {
                 Text(product.price.toString()),
                 TextButton(
                   onPressed: () {},
-                  child: Text("Add to cart"),
+                  child: const Text("Add to cart"),
                 ),
                 Text(product.ratings.rate.toString())
               ],
