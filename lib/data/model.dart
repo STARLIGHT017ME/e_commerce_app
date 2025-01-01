@@ -1,6 +1,8 @@
 class ECommerceModel {
   late final double id;
   late final String title;
+  late final String category;
+
   late final double price;
   late final String description;
   late final String image;
@@ -9,6 +11,7 @@ class ECommerceModel {
   ECommerceModel({
     required this.id,
     required this.title,
+    required this.category,
     required this.price,
     required this.description,
     required this.image,
@@ -23,6 +26,7 @@ class ECommerceModel {
       description: json["description"],
       image: json["image"],
       ratings: Ratings.fromJson(json["rating"]),
+      category: json["category"],
     );
   }
 }

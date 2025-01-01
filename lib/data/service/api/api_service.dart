@@ -14,7 +14,7 @@ class ApiService {
       print(jsonDecode(response.body));
       return List<Map<String, dynamic>>.from(json.decode(response.body));
     } else {
-      throw ("Failed to fetch products. Status code: ${response.statusCode}");
+      return throw ("Failed to fetch products. Status code: ${response.statusCode}");
     }
   }
 }
