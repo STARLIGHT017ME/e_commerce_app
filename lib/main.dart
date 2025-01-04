@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:e_commerce_app/presentation/home/widget/homepage.dart';
+import 'package:e_commerce_app/presentation/screens/home/widget/homepage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

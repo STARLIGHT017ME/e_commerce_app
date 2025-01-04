@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce_app/data/app_data.dart';
-import 'package:e_commerce_app/presentation/home/view_models/homemodel.dart';
-import 'package:e_commerce_app/presentation/home/widget/custom_slider.dart';
-import 'package:e_commerce_app/presentation/product_details/widget/product_detail.dart';
+import 'package:e_commerce_app/presentation/screens/home/view_models/home_model.dart';
+import 'package:e_commerce_app/presentation/screens/home/widget/custom_slider.dart';
+import 'package:e_commerce_app/presentation/screens/product_details/widget/product_detail.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +41,8 @@ class _HomepageState extends ConsumerState<Homepage>
 
   @override
   Widget build(BuildContext context) {
-    final products = ref.watch(productProvider);
+    final productState = ref.watch(productProvider);
+    final productNotifier = ref.watch(productProvider.notifier);
 
     Size size;
     double height, width;
@@ -50,72 +51,75 @@ class _HomepageState extends ConsumerState<Homepage>
     width = size.width;
     return SafeArea(
       child: Scaffold(
-        body: products.when(
-          data: (productList) {
-            final categories = productList
-                .map((categories) => categories.category)
-                .toSet()
-                .map((category) => mapCategory(category))
-                .toList();
-            return CustomScrollView(
-              slivers: <Widget>[
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 30,
+        body: productState.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : productState.errorMessage != null
+                ? Text("Error: ${productState.errorMessage}")
+                : CustomScrollView(
+                    slivers: <Widget>[
+                      SliverToBoxAdapter(
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: searchBar(productNotifier),
+                            ),
+                            sliderdisplay(height, width),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                          ],
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: searchBar(),
+                      SliverToBoxAdapter(
+                        child: categoryFilter(
+                          productState.selectedCategory,
+                          productNotifier,
+                        ),
                       ),
-                      sliderdisplay(height, width),
-                      const SizedBox(
-                        height: 20,
+                      SliverList(
+                        delegate: productState.filteredProducts.isEmpty
+                            ? SliverChildListDelegate(
+                                [
+                                  const Center(
+                                    child: Text(
+                                        "No products found for this category."),
+                                  ),
+                                ],
+                              )
+                            : SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final product =
+                                      productState.filteredProducts[index];
+
+                                  return ListTile(
+                                    title: Text(product.title),
+                                    subtitle: Text("\$${product.price}"),
+                                    leading: CachedNetworkImage(
+                                      imageUrl: product.image,
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProductDetail(product: product),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                childCount:
+                                    productState.filteredProducts.length,
+                              ),
                       ),
                     ],
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: category(categories),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final product = productList[index];
-
-                      return ListTile(
-                        title: Text(product.title),
-                        subtitle: Text("\$${product.price}"),
-                        leading: CachedNetworkImage(
-                          imageUrl: product.image,
-                          placeholder: (context, url) =>
-                              const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ProductDetail(product: product),
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: productList.length,
-                  ),
-                )
-              ],
-            );
-          },
-          error: (error, stackTrace) => SliverToBoxAdapter(
-            child: Text("Error : $error"),
-          ),
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
         //bottom navigation bar
         bottomNavigationBar: Container(
           padding: const EdgeInsets.only(bottom: 5, left: 10, right: 10),
@@ -166,79 +170,62 @@ class _HomepageState extends ConsumerState<Homepage>
     );
   }
 
-  // Map categories to standardized names
-  String mapCategory(String category) {
-    switch (category.toLowerCase()) {
-      case "men's clothing":
-        return "Men";
-      case "women's clothing":
-        return "Women";
-      default:
-        return category;
-    }
-  }
+  Widget categoryFilter(String selectedCategory, ProductNotifier notifier) {
+    final categories =
+        notifier.uniqueCategories; // Dynamically fetch categories
 
-  //categories
-
-  Widget category(List<String> categories) {
     return SizedBox(
-      height: 40,
+      height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        itemBuilder: (BuildContext context, int index) {
-          return buildCategories(index, categories);
+        itemBuilder: (context, index) {
+          final category = categories[index];
+
+          final isSelected = selectedCategory == category;
+          return GestureDetector(
+            onTap: () => notifier.filterByCategory(category),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? Colors.black : Colors.grey,
+                      fontSize: isSelected ? 17 : 15,
+                    ),
+                  ),
+                  if (isSelected)
+                    Container(
+                      margin: const EdgeInsets.only(top: 5),
+                      height: 2,
+                      width: 30,
+                      color: isSelected ? Colors.black : Colors.transparent,
+                    ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
   }
 
-  Widget buildCategories(int indexs, List<String> categories) {
-    return Builder(builder: (context) {
-      return GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedCategories = indexs;
-          });
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                categories[indexs],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                height: 2,
-                width: 30,
-                color: selectedCategories == indexs
-                    ? Colors.black
-                    : Colors.transparent,
-              )
-            ],
-          ),
-        ),
-      );
-    });
-  }
-
 //search bar
-  Widget searchBar() {
+  Widget searchBar(ProductNotifier notifier) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
       ),
       child: TextField(
+        onChanged: (value) => notifier.searchProducts(value),
         controller: searchController,
         decoration: InputDecoration(
           fillColor: const Color.fromRGBO(233, 233, 233, 3),
-          hintText: "Search",
+          hintText: " Search products ......",
           prefixIcon: GestureDetector(
             child: const FaIcon(
               FontAwesomeIcons.magnifyingGlass,

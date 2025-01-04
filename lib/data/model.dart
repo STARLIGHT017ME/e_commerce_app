@@ -1,3 +1,5 @@
+//model the format in which the data from the api request is going to be formatted
+
 class ECommerceModel {
   late final double id;
   late final String title;
