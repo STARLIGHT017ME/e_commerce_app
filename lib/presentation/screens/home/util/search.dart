@@ -1,5 +1,5 @@
 //search bar
-import 'package:e_commerce_app/presentation/screens/home/view_models/home_model.dart';
+import 'package:e_commerce_app/presentation/screens/home/provider/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

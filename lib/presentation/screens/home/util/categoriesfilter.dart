@@ -1,13 +1,12 @@
-import 'dart:ui';
-
-import 'package:e_commerce_app/presentation/screens/home/view_models/home_model.dart';
+import 'package:e_commerce_app/presentation/screens/home/provider/home_provider.dart';
 import 'package:flutter/material.dart';
 
 class CategoryFilter extends StatefulWidget {
   final String selectedCategory;
   final ProductNotifier notifier;
 
-  CategoryFilter({required this.selectedCategory, required this.notifier});
+  const CategoryFilter(
+      {super.key, required this.selectedCategory, required this.notifier});
 
   @override
   _CategoryFilterState createState() => _CategoryFilterState();

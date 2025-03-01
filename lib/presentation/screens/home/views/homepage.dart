@@ -1,10 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce_app/data/app_data.dart';
 import 'package:e_commerce_app/presentation/screens/cart/Views/cart.dart';
+import 'package:e_commerce_app/presentation/screens/home/provider/home_provider.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/categoriesfilter.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/productcard.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/search.dart';
-import 'package:e_commerce_app/presentation/screens/home/view_models/home_model.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/custom_slider.dart';
 import 'package:e_commerce_app/presentation/screens/product_details/widget/product_detail.dart';
 
@@ -68,8 +68,7 @@ class _HomepageState extends ConsumerState<Homepage>
                       actions: [
                         IconButton(
                           icon: const Icon(Icons.shopping_cart),
-                          onPressed: () =>
-                              Navigator.of(context).pushReplacement(
+                          onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const Cart(),
                             ),
@@ -123,7 +122,7 @@ class _HomepageState extends ConsumerState<Homepage>
                             product.title,
                             product.price.toString(),
                             product.ratings.rate.toString(),
-                            () => Navigator.pushReplacement(
+                            () => Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>

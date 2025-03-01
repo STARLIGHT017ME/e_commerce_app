@@ -15,33 +15,24 @@ class Custombuttomnavigationbar extends StatelessWidget {
       unselectedItemColor: Colors.black,
       currentIndex: currentIndex,
       onTap: onTap,
-      items: <BottomNavigationBarItem>[
-        const BottomNavigationBarItem(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
             icon: FaIcon(
               FontAwesomeIcons.house,
             ),
             label: 'Home'),
         BottomNavigationBarItem(
-          icon: GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const Search(),
-                ),
-              );
-            },
-            child: const FaIcon(
-              FontAwesomeIcons.magnifyingGlass,
-            ),
+          icon: FaIcon(
+            FontAwesomeIcons.magnifyingGlass,
           ),
           label: 'Search',
         ),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: FaIcon(
               FontAwesomeIcons.heart,
             ),
             label: 'Wishlist'),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
             icon: FaIcon(
               FontAwesomeIcons.user,
             ),

@@ -1,32 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce_app/data/model.dart';
+import 'package:e_commerce_app/presentation/screens/cart/provider/cart_provider.dart';
+import 'package:e_commerce_app/presentation/screens/cart/view_model/cart_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductDetail extends StatelessWidget {
+class ProductDetail extends ConsumerWidget {
   final ECommerceModel product;
 
   const ProductDetail({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 5.0),
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Card(
-              elevation: 1,
-              color: Colors.grey.shade300,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.arrow_back),
-              ),
-            ),
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context), // Correctly pop the page
         ),
         title: const Center(
           child: Text(
@@ -34,22 +26,13 @@ class ProductDetail extends StatelessWidget {
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
         ),
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 5.0),
-            child: Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              color: Colors.grey.shade300,
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Icon(
-                  Icons.favorite_border_outlined,
-                  color: Colors.black,
-                  size: 25,
-                ),
-              ),
+            padding: EdgeInsets.only(right: 10.0),
+            child: Icon(
+              Icons.favorite_border_outlined,
+              color: Colors.black,
+              size: 25,
             ),
           ),
         ],
@@ -148,39 +131,45 @@ class ProductDetail extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
         child: Row(children: [
           Expanded(
-            child: GestureDetector(
-              child: Card(
-                elevation: 2,
-                color: Colors.grey.shade300,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(25.0),
-                  child: Icon(
-                    Icons.shopping_cart,
-                    size: 34,
-                  ),
-                ),
+            flex: 1,
+            child: Text(
+              "\$${product.price}",
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
           const SizedBox(
-            width: 5,
+            width: 20,
           ),
           Expanded(
             flex: 3,
             child: GestureDetector(
+              onTap: () {
+                final cartItem = CartModel(
+                    id: product.id.toString(),
+                    name: product.title,
+                    price: product.price.toString(),
+                    imageUrl: product.image);
+                ref.read(cartProvider.notifier).addproduct(cartItem);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${product.title} added to cart'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
               child: Card(
                   elevation: 2,
-                  color: const Color.fromRGBO(14, 23, 38, 3),
+                  color: const Color(0xFF48D861),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(25.0),
                     child: Text(
-                      "Buy Now",
+                      "Add to Cart",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white, fontSize: 25),
                     ),

@@ -4,11 +4,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'cart_model.freezed.dart';
 
 @freezed
-class Cart with _$Cart {
-  const factory Cart({
+class CartModel with _$CartModel {
+  const factory CartModel({
     required String id,
     required String name,
     required String price,
     required String imageUrl,
-  }) = _Cart;
+  }) = _CartModel;
 }
