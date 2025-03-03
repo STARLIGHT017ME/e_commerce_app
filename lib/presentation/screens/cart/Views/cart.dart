@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce_app/presentation/screens/cart/provider/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,82 +10,115 @@ class Cart extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cartItems = ref.watch(cartProvider);
+    double totalPrice = cartItems.fold(
+        0, (sum, item) => sum + double.parse(item.price) * item.quantity);
     return Scaffold(
-        appBar: AppBar(
-          leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Icon(Icons.arrow_back, color: Colors.black)),
-          title: const Center(
-            child: Text(
-              'C a r t',
-              style: TextStyle(color: Colors.black, fontSize: 27),
-            ),
+      appBar: AppBar(
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
+        title: const Center(
+          child: Text(
+            'My Cart',
+            style: TextStyle(color: Colors.black, fontSize: 27),
           ),
         ),
-        body: ListView.builder(
-          itemCount: cartItems.length,
-          itemBuilder: (context, index) {
-            final item = cartItems[index];
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Image.network(
-                    item.imageUrl,
-                    height: 100,
-                    width: 100,
-                  ),
-                  Expanded(
-                    child: ListTile(
-                      title: Text(item.name),
-                      subtitle: Text('Price: ${item.price}'),
-                      trailing: IconButton(
-                        icon: const FaIcon(
-                          FontAwesomeIcons.trash,
-                          color: Color.fromRGBO(186, 12, 47, 1),
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          ref
-                              .read(cartProvider.notifier)
-                              .removeProduct(item.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${item.name} removed from cart'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+      ),
+      body: cartItems.isEmpty
+          ? const Center(
+              child: Text(
+                'No items in cart',
+                style: TextStyle(fontSize: 20),
               ),
-            );
-          },
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              const Text("Total: \$500", style: TextStyle(fontSize: 25)),
-              const Spacer(),
-              Card(
-                  elevation: 2,
-                  color: const Color(0xFF48D861),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            )
+          : ListView.builder(
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                final item = cartItems[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: item.imageUrl,
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        height: 100,
+                        width: 100,
+                      ),
+                      Expanded(
+                        child: ListTile(
+                          title: Text(item.name),
+                          subtitle: Text('Price: \$${item.price}'),
+                          trailing: IconButton(
+                            icon: const FaIcon(
+                              FontAwesomeIcons.trash,
+                              color: Color.fromRGBO(186, 12, 47, 1),
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              ref
+                                  .read(cartProvider.notifier)
+                                  .removeProduct(item.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('${item.name} removed from cart'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              ref.read(cartProvider.notifier).addproduct(item);
+                            },
+                            icon: const Icon(Icons.add_circle_outline),
+                          ),
+                          Text(
+                            '${item.quantity}',
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              ref
+                                  .read(cartProvider.notifier)
+                                  .decreaseProduct(item.id);
+                            },
+                            icon: const Icon(Icons.remove_circle_outline),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text(
-                      "Add to Cart",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 25),
-                    ),
-                  )),
-            ],
-          ),
-        ));
+                );
+              },
+            ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Card(
+            elevation: 2,
+            color: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                "Checkout for \$$totalPrice",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 25),
+              ),
+            )),
+      ),
+    );
   }
 }

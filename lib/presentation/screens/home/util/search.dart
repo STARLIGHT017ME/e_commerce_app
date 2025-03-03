@@ -33,7 +33,7 @@ Widget searchBar(ProductNotifier notifier) {
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(
-            color: Colors.black,
+            color: Colors.transparent,
           ),
           borderRadius: BorderRadius.circular(15),
         ),

@@ -20,6 +20,7 @@ mixin _$CartModel {
   String get name => throw _privateConstructorUsedError;
   String get price => throw _privateConstructorUsedError;
   String get imageUrl => throw _privateConstructorUsedError;
+  int get quantity => throw _privateConstructorUsedError;
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
@@ -33,7 +34,8 @@ abstract class $CartModelCopyWith<$Res> {
   factory $CartModelCopyWith(CartModel value, $Res Function(CartModel) then) =
       _$CartModelCopyWithImpl<$Res, CartModel>;
   @useResult
-  $Res call({String id, String name, String price, String imageUrl});
+  $Res call(
+      {String id, String name, String price, String imageUrl, int quantity});
 }
 
 /// @nodoc
@@ -55,6 +57,7 @@ class _$CartModelCopyWithImpl<$Res, $Val extends CartModel>
     Object? name = null,
     Object? price = null,
     Object? imageUrl = null,
+    Object? quantity = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -73,6 +76,10 @@ class _$CartModelCopyWithImpl<$Res, $Val extends CartModel>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      quantity: null == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -85,7 +92,8 @@ abstract class _$$CartModelImplCopyWith<$Res>
       __$$CartModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String price, String imageUrl});
+  $Res call(
+      {String id, String name, String price, String imageUrl, int quantity});
 }
 
 /// @nodoc
@@ -105,6 +113,7 @@ class __$$CartModelImplCopyWithImpl<$Res>
     Object? name = null,
     Object? price = null,
     Object? imageUrl = null,
+    Object? quantity = null,
   }) {
     return _then(_$CartModelImpl(
       id: null == id
@@ -123,6 +132,10 @@ class __$$CartModelImplCopyWithImpl<$Res>
           ? _value.imageUrl
           : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      quantity: null == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -134,7 +147,8 @@ class _$CartModelImpl with DiagnosticableTreeMixin implements _CartModel {
       {required this.id,
       required this.name,
       required this.price,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.quantity});
 
   @override
   final String id;
@@ -144,10 +158,12 @@ class _$CartModelImpl with DiagnosticableTreeMixin implements _CartModel {
   final String price;
   @override
   final String imageUrl;
+  @override
+  final int quantity;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CartModel(id: $id, name: $name, price: $price, imageUrl: $imageUrl)';
+    return 'CartModel(id: $id, name: $name, price: $price, imageUrl: $imageUrl, quantity: $quantity)';
   }
 
   @override
@@ -158,7 +174,8 @@ class _$CartModelImpl with DiagnosticableTreeMixin implements _CartModel {
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('price', price))
-      ..add(DiagnosticsProperty('imageUrl', imageUrl));
+      ..add(DiagnosticsProperty('imageUrl', imageUrl))
+      ..add(DiagnosticsProperty('quantity', quantity));
   }
 
   @override
@@ -170,11 +187,14 @@ class _$CartModelImpl with DiagnosticableTreeMixin implements _CartModel {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.imageUrl, imageUrl) ||
-                other.imageUrl == imageUrl));
+                other.imageUrl == imageUrl) &&
+            (identical(other.quantity, quantity) ||
+                other.quantity == quantity));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, price, imageUrl);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, price, imageUrl, quantity);
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
@@ -190,7 +210,8 @@ abstract class _CartModel implements CartModel {
       {required final String id,
       required final String name,
       required final String price,
-      required final String imageUrl}) = _$CartModelImpl;
+      required final String imageUrl,
+      required final int quantity}) = _$CartModelImpl;
 
   @override
   String get id;
@@ -200,6 +221,8 @@ abstract class _CartModel implements CartModel {
   String get price;
   @override
   String get imageUrl;
+  @override
+  int get quantity;
 
   /// Create a copy of CartModel
   /// with the given fields replaced by the non-null parameter values.
