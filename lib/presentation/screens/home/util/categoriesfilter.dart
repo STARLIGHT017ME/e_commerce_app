@@ -18,7 +18,7 @@ class _CategoryFilterState extends State<CategoryFilter> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = widget.selectedCategory;
+    selectedCategory = "All";
   }
 
   @override

@@ -1,10 +1,40 @@
+import 'package:e_commerce_app/presentation/general_util/themenotifier.dart';
 import 'package:e_commerce_app/presentation/screens/login/provider/authprovider.dart';
 import 'package:e_commerce_app/presentation/screens/login/view/authpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String? userEmail;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fechuser();
+  }
+
+  void _fechuser() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      setState(() {
+        userEmail = user.email;
+      });
+    } else {
+      setState(() {
+        userEmail = 'User not found';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,42 +63,15 @@ class Profile extends StatelessWidget {
               ),
               Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 55,
-                    backgroundColor: Colors.white,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage:
-                          NetworkImage('https://via.placeholder.com/150'),
-                    ),
-                  ),
                   const SizedBox(height: 10),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final user = ref.watch(authProvider);
-                      return Text(
-                        "${user.user?.displayName}",
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      );
-                    },
-                  ),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final user = ref.watch(authProvider);
-
-                      return Text(
-                        "${user.user?.email}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      );
-                    },
-                  ),
+                  Text(
+                    userEmail ?? "Loading....",
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  )
                 ],
               ),
             ],
@@ -99,7 +102,17 @@ class Profile extends StatelessWidget {
                   const SizedBox(
                     width: 10,
                   ),
-                  _buildOption(Icons.settings, "Settings"),
+                  _buildOption(
+                    Icons.settings,
+                    "Settings",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingsPage()),
+                      );
+                    },
+                  ),
                   const SizedBox(
                     width: 10,
                   ),
@@ -114,10 +127,12 @@ class Profile extends StatelessWidget {
                       isLogout: true,
                       onTap: () async {
                         await ref.read(authProvider.notifier).logout();
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AuthPage()));
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AuthPage()),
+                          (route) => false,
+                        );
                       },
                     );
                   }),
@@ -147,6 +162,44 @@ class Profile extends StatelessWidget {
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Settings',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.brightness_6),
+              title: const Text('Dark Mode'),
+              trailing: Switch(
+                value: themeMode == ThemeMode.dark,
+                onChanged: (value) {
+                  ref.read(themeProvider.notifier).toggleTheme();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

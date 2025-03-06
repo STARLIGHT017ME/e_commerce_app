@@ -3,18 +3,18 @@ import 'package:e_commerce_app/screendisplay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthPage extends StatefulWidget {
+class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  ConsumerState<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage>
+class _AuthPageState extends ConsumerState<AuthPage>
     with SingleTickerProviderStateMixin {
   bool isLogin = true;
   late AnimationController _controller;
-  late Animation<double> _animation;
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
@@ -23,7 +23,8 @@ class _AuthPageState extends State<AuthPage>
   void initState() {
     _controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
-    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(
+    late Animation<double> _animation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
     super.initState();
@@ -111,6 +112,30 @@ class _AuthPageState extends State<AuthPage>
             _buildInputField(Icons.email, "Email", _emailController),
             _buildInputField(Icons.lock, "Password", _passwordController,
                 obscureText: true),
+            if (isLogin)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () async {
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please enter your email"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    await ref
+                        .read(authProvider.notifier)
+                        .resetPassword(_emailController.text.trim());
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+              ),
           ],
           buttonText: "Login",
           onPressed: () async {
@@ -158,37 +183,38 @@ class _AuthPageState extends State<AuthPage>
         final authState = ref.watch(authProvider);
 
         return _buildGlassForm(
-          title: "Create an Account",
-          subtitle: "Sign up to get started",
-          fields: [
-            _buildInputField(Icons.person, "Full Name", _nameController),
-            _buildInputField(Icons.email, "Email", _emailController),
-            _buildInputField(Icons.lock, "Password", _passwordController,
-                obscureText: true),
-          ],
-          buttonText: "Sign Up",
-          onPressed: () async {
-            if (_emailController.text.isEmpty ||
-                _passwordController.text.isEmpty ||
-                _nameController.text.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Please fill in all fields"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
-            print("Email: ${_emailController.text}");
-            print("Password: ${_passwordController.text}");
-            print("Name: ${_nameController.text}");
+            title: "Create an Account",
+            subtitle: "Sign up to get started",
+            fields: [
+              _buildInputField(Icons.person, "Full Name", _nameController),
+              _buildInputField(Icons.email, "Email", _emailController),
+              _buildInputField(Icons.lock, "Password", _passwordController,
+                  obscureText: true),
+            ],
+            buttonText: "Sign Up",
+            onPressed: () async {
+              if (_emailController.text.isEmpty ||
+                  _passwordController.text.isEmpty ||
+                  _nameController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Please fill in all fields"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+              print("Email: ${_emailController.text}");
+              print("Password: ${_passwordController.text}");
+              print("Name: ${_nameController.text}");
 
-            ref.read(authProvider.notifier).signUp(
-                _emailController.text.trim(), _passwordController.text.trim());
+              ref.read(authProvider.notifier).signUp(
+                  _emailController.text.trim(),
+                  _passwordController.text.trim());
 
-            //wait for ui update
+              //wait for ui update
 
-            Future.delayed(const Duration(seconds: 2), () {
+              Future.delayed(const Duration(seconds: 2));
               if (authState.user != null) {
                 Navigator.pushReplacement(
                     context,
@@ -203,88 +229,85 @@ class _AuthPageState extends State<AuthPage>
                 );
               }
             });
-          },
-        );
       },
     );
   }
+}
 
-  // Reusable Glassmorphic Form
-  Widget _buildGlassForm({
-    required String title,
-    required String subtitle,
-    required List<Widget> fields,
-    required String buttonText,
-    required VoidCallback onPressed,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
-            Text(subtitle,
-                style: const TextStyle(color: Colors.white70, fontSize: 16)),
-            const SizedBox(height: 20),
-            ...fields,
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black.withOpacity(0.8),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
-              ),
-              child: Text(buttonText, style: const TextStyle(fontSize: 18)),
+// Reusable Glassmorphic Form
+Widget _buildGlassForm({
+  required String title,
+  required String subtitle,
+  required List<Widget> fields,
+  required String buttonText,
+  required VoidCallback onPressed,
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 25),
+    child: Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 2),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          Text(subtitle,
+              style: const TextStyle(color: Colors.white70, fontSize: 16)),
+          const SizedBox(height: 20),
+          ...fields,
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black.withOpacity(0.8),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
             ),
-          ],
-        ),
+            child: Text(buttonText, style: const TextStyle(fontSize: 18)),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  // Custom Input Field
-  Widget _buildInputField(
-      IconData icon, String hint, TextEditingController controller,
-      {bool obscureText = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.2),
-          prefixIcon: Icon(icon, color: Colors.white),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none),
-        ),
+// Custom Input Field
+Widget _buildInputField(
+    IconData icon, String hint, TextEditingController controller,
+    {bool obscureText = false}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: TextField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.2),
+        prefixIcon: Icon(icon, color: Colors.white),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
       ),
-    );
-  }
+    ),
+  );
 }

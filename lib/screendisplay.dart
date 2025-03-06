@@ -1,7 +1,7 @@
 import 'package:e_commerce_app/presentation/general_util/customButtomNavigationBar.dart';
 import 'package:e_commerce_app/presentation/screens/home/views/homepage.dart';
 import 'package:e_commerce_app/presentation/screens/profile/view/profile.dart';
-import 'package:e_commerce_app/presentation/screens/search.dart';
+import 'package:e_commerce_app/presentation/screens/search/search.dart';
 import 'package:e_commerce_app/presentation/screens/wishlist/view/wishlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +18,7 @@ class _ScreendisplayState extends ConsumerState<Screendisplay>
   int selectedIndex = 0;
   final List<Widget> _pages = [
     const Homepage(),
-    const Search(),
+    const SearchPage(),
     const Wishlist(),
     const Profile(),
   ];

@@ -41,6 +41,16 @@ class Authprovider extends StateNotifier<Authstate> {
     }
   }
 
+  //reset password
+  Future<void> resetPassword(String email) async {
+    try {
+      await _authservice.resetPassword(email);
+      state = state.copyWith(message: "Password reset email sent!");
+    } catch (e) {
+      state = state.copyWith(message: e.toString());
+    }
+  }
+
   Future<void> logout() async {
     await _authservice.signOut();
     state = state.copyWith(user: null, message: "Logged Out", isLoading: false);

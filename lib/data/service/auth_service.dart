@@ -16,6 +16,8 @@ class AuthService {
         message = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
         message = 'The account already exists for that email.';
+      } else if (e.code == 'Invalid-email') {
+        message = 'Invalid-email';
       }
       Fluttertoast.showToast(
           msg: message,
@@ -46,6 +48,8 @@ class AuthService {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
         message = 'Wrong password provided for that user.';
+      } else if (e.code == 'invalid-credential') {
+        message = 'invalid-credential';
       }
       Fluttertoast.showToast(
         msg: message,
@@ -64,6 +68,27 @@ class AuthService {
         gravity: ToastGravity.BOTTOM,
       );
       return null;
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+      Fluttertoast.showToast(
+        msg: "Password reset email sent!",
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16,
+        gravity: ToastGravity.BOTTOM,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Failed to send password reset email.",
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16,
+        gravity: ToastGravity.BOTTOM,
+      );
     }
   }
 

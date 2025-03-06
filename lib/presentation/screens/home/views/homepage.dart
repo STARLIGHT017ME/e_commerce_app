@@ -4,7 +4,6 @@ import 'package:e_commerce_app/presentation/screens/cart/Views/cart.dart';
 import 'package:e_commerce_app/presentation/screens/home/provider/home_provider.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/categoriesfilter.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/productcard.dart';
-import 'package:e_commerce_app/presentation/screens/home/util/search.dart';
 import 'package:e_commerce_app/presentation/screens/home/util/custom_slider.dart';
 import 'package:e_commerce_app/presentation/screens/product_details/widget/product_detail.dart';
 
@@ -61,7 +60,7 @@ class _HomepageState extends ConsumerState<Homepage>
                     SliverAppBar(
                       pinned: true,
                       title: const Text(
-                        "D i s c o v e r",
+                        "Discover",
                         style: TextStyle(
                             fontSize: 30, fontWeight: FontWeight.bold),
                       ),
@@ -79,7 +78,6 @@ class _HomepageState extends ConsumerState<Homepage>
                     SliverToBoxAdapter(
                       child: Column(
                         children: [
-                          searchBar(productNotifier),
                           sliderdisplay(height, width),
                           const SizedBox(
                             height: 20,
